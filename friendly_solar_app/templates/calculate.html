@@ -1,0 +1,349 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculate Solar Irradiance</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-image: url("{% static 'img/Europeana.eu-2022502-_KAMRA_309879-49f81f93bd938152120c853dcc40e0d8.jpeg' %}");
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        /* Top Menu Styles */
+        .top-menu {
+            background-color: rgba(114, 163, 74, 0.8);
+            padding: 10px 20px;
+        }
+
+        .top-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .top-menu li {
+            display: inline;
+        }
+
+        .top-menu a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .top-menu a:hover {
+            background-color: #5c8536;
+        }
+
+        /* Hero Section Styles */
+        .hero-section {
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            position: relative;
+            background-color: rgba(253, 225, 1, 0.3);
+        }
+
+        .hero-section h1 {
+            font-size: 64px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .hero-section p {
+            font-size: 24px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .photo-attribution {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            font-size: 12px;
+            color: #fff;
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        /* Main Content Styles */
+        .main-field {
+            text-align: center;
+            padding: 60px;
+            color: #333;
+            background-color: rgba(255, 209, 26, 0.9);
+        }
+
+        .main-field h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #72a34a;
+        }
+
+        .main-content {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(10, 10, 10, 0.1);
+            background-color: rgba(255, 250, 230, 0.8);
+        }
+
+        .main-content label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        .main-content input[type="text"],
+        .main-content input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .main-content input[type="submit"] {
+            background-color: #72a34a;
+            border: none;
+            color: #fffae6;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .main-content input[type="submit"]:hover {
+            background-color: #5c8536;
+        }
+
+        /* Feature Section Styles */
+        .feature-section {
+            padding: 60px;
+            text-align: center;
+            background-color: rgba(253, 225, 1, 0.3);
+        }
+
+        .feature-section h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #72a34a;
+        }
+
+        .feature-section p {
+            font-size: 18px;
+            max-width: 800px;
+            margin: 0 auto 40px;
+        }
+
+        /* Bottom Informational Section Styles */
+        .info-section {
+            background-color: rgba(255, 250, 230, 0.8);
+            padding: 40px;
+            text-align: center;
+        }
+
+        .info-content {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .info-content h2 {
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .info-content p {
+            font-size: 18px;
+        }
+
+        /* CSS for city options */
+        .city-options {
+            max-height: 200px;
+            overflow-y: auto;
+            position: absolute;
+            width: 100%;
+            background-color: #fff;
+            border: 1px solid #ccc;
+        }
+
+        .city-option {
+            padding: 10px;
+            cursor: pointer;
+        }
+
+        .city-option:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* Style the input field as needed */
+        #cityInput {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+    </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        // Define cityData as a global variable to make it accessible in selectCity
+        let cityData;
+
+        // Function to fetch city data
+        function fetchCityData() {
+            return fetch('/static/js/cities.json')
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error loading JSON data:', error);
+                });
+        }
+
+        // Function to populate city dropdown
+        async function populateCityDropdown() {
+            // Load the city data
+            cityData = await fetchCityData();
+
+            // Get references to the input field and city options div
+            const cityInput = document.getElementById('cityInput');
+            const cityOptions = document.querySelector('.city-options');
+
+            // Function to filter and display city options based on user input
+            function filterCities(query) {
+                if (!cityData) {
+                    return;
+                }
+                const filteredCities = cityData.filter(city => {
+                    return city.city.toLowerCase().includes(query.toLowerCase());
+                });
+                const html = filteredCities.map(city => {
+                    return `<div class="city-option" data-city-info='${JSON.stringify(city)}'>${city.city}, ${city.country}</div>`;
+                }).join('');
+                cityOptions.innerHTML = html;
+            }
+
+            // Function to handle city selection
+            function selectCity(selectedCity, latitude, longitude) {
+                const cityInput = document.getElementById('cityInput');
+                cityInput.value = selectedCity;
+
+                // Set the latitude and longitude values in the form
+                const latitudeInput = document.getElementById('latitude');
+                const longitudeInput = document.getElementById('longitude');
+                latitudeInput.value = latitude;
+                longitudeInput.value = longitude;
+
+                // Submit the cityForm when a city is selected
+                document.getElementById('cityForm').submit();
+            }
+
+            // Add an input event listener to trigger filtering on user input
+            cityInput.addEventListener('input', function () {
+                const query = this.value;
+                filterCities(query);
+            });
+
+            // Add an event listener to the city-options div for handling clicks
+            cityOptions.addEventListener('click', function (event) {
+                const target = event.target;
+                if (target.classList.contains('city-option')) {
+                    const cityInfo = JSON.parse(target.getAttribute('data-city-info'));
+                    selectCity(cityInfo.city, cityInfo.lat, cityInfo.lng);
+                }
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            populateCityDropdown();
+        });
+    </script>
+</head>
+
+<body>
+    <!-- Hero Section -->
+    <section class="hero-section">
+        <div class="hero-content">
+            <h1>Welcome to FRIENDLY SOLAR</h1>
+            <p>Your Reliable Source for Solar Irradiance Information</p>
+        </div>
+        <div class="photo-attribution">
+            Photo by Pirih, Dušan - 2020 - Jesenice Municipal Library, Slovenia
+            <br>
+            License: CC BY-NC
+            <br>
+            Source: <a href="https://www.europeana.eu/item/2022502/_KAMRA_309879" target="_blank">Europeana</a>
+        </div>
+    </section>
+
+    <!-- Top Menu -->
+    <nav class="top-menu">
+        <ul>
+            <li><a href="{% url 'account_login' %}">Login</a></li>
+            <li><a href="{% url 'account_signup' %}">Signup</a></li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-field">
+        <div class="main-content">
+            <h2>Calculate Solar Irradiance</h2>
+            <form method="post" action="{% url 'calculate' %}" id="cityForm">
+                {% csrf_token %}
+                <label for="city">Select a city:</label>
+                <input type="text" id="cityInput" name="city" placeholder="Start typing a city...">
+                <input type="hidden" id="latitude" name="latitude">
+                <input type="hidden" id="longitude" name="longitude">
+                <div class="city-options"></div>
+                <br>
+                <button type="submit">Calculate</button>
+            </form>
+
+            <form method="post" action="{% url 'calculate' %}" id="coordinatesForm">
+                {% csrf_token %}
+                <label for="latitude">Latitude:</label>
+                <input type="number" id="latitude" name="latitude" required min="-90" max="90" step="any" placeholder="Enter latitude...">
+                <br>
+                <label for="longitude">Longitude:</label>
+                <input type="number" id="longitude" name="longitude" required min="-180" max="180" step="any" placeholder="Enter longitude...">
+                <br>
+                <input type="submit" value="Calculate">
+            </form>
+        </div>
+    </main>
+
+    <!-- Feature Section -->
+    <section class="feature-section">
+        <h2>Why Choose Friendly Solar?</h2>
+        <p>The goal of Friendly Solar is to provide the accurate solar irradiance prognosis to the general public. Households are of particular interest of this project and great amount of work was put to helping them out achive the ecological and economical energy consumption patterns. The weekly planner is an innovative feature, that provides users with the possibility to plan out household chores for the best use of solar generated energy. Just sign up, complete the profile with details about used solar panels and start being smarter about the energy usage today!</p>
+    </section>
+
+    <!-- Bottom Informational Section -->
+    <section class="info-section">
+        <div class="info-content">
+            <h2>About Solar Irradiance Calculation</h2>
+            <p>Friendly Solar is a non-profit project that has benefited largly from the OpenMeteo data base. The meteorological data was used to train around two thousands of artificial intelligence models that predict direct solar irradiance localy. The weekly planner is also taking the solar panels efficiency and the difference between their position and sun angles for even closer modelling of expected solar energy production.</p>
+        </div>
+    </section>
+</body>
+
+</html>

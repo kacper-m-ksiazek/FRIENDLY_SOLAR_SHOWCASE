@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Appliance to Weekly Planner</title>
+</head>
+<body>
+    <h1>Add Appliance to Weekly Planner</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="appliance">Select Appliance:</label>
+        <select name="appliance" id="appliance">
+            {% for appliance in appliances %}
+            <option value="{{ appliance.id }}">{{ appliance.name }}</option>
+            {% endfor %}
+        </select>
+        <input type="submit" value="Add Appliance">
+    </form>
+</body>
+</html>

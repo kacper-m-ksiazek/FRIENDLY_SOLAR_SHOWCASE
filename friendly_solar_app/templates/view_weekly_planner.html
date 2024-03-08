@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Weekly Planner</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+
+        /* Top Menu Styles */
+        .top-menu {
+            background-color: #72a34a;
+            padding: 10px 20px;
+        }
+
+        .top-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .top-menu li {
+            display: inline;
+            margin-left: 20px;
+        }
+
+        .top-menu a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .top-menu a:hover {
+            background-color: #5c8536;
+        }
+
+        /* Main Content Styles */
+
+
+            /* Button Styles */
+    .button {
+        display: inline-block;
+        background-color: #72a34a;
+        color: #fff;
+        padding: 12px 24px;
+        font-size: 18px;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+        margin-bottom: 20px; /* Add some space between the button and the table */
+    }
+
+    .button:hover {
+        background-color: #5c8536;
+    }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: 36px;
+            color: #72a34a;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            background-color: #72a34a;
+            color: #fff;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        input[type="hidden"],
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 20px;
+        }
+
+        input[type="submit"] {
+            background-color: #72a34a;
+            color: #fff;
+            padding: 12px 24px;
+            font-size: 18px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #5c8536;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <!-- Top Menu -->
+    <nav class="top-menu">
+        <ul>
+            <li><a href="{% url 'user_profile' %}">Home</a></li>
+            <li><a href="{% url 'user_profile' %}">Profile</a></li>
+            <li><a href="{% url 'account_logout' %}">Logout</a></li>
+        </ul>
+    </nav>
+
+
+<a href="{% url 'create_appliance' %}" class="button">Create Appliance</a>
+
+
+    <div class="container">
+        <h1>Weekly Planner</h1>
+
+        <canvas id="energy-chart" width="400" height="200"></canvas>
+
+        <table>
+            <tr>
+                <th>Date</th>
+                <th>Hour</th>
+                <th>Predicted Irradiance (W/m2)</th>
+                <th>Energy Produced (W)</th>
+                <th>Appliances</th>
+                <th>Energy Used (W)</th> 
+                <th>Action</th>
+            </tr>
+            {% for prediction in predictions %}
+            <tr>
+                <td>{{ prediction.date }}</td>
+                <td>{{ prediction.hour }}</td>
+                <td>{{ prediction.predictions }}</td>
+                <td>{{ prediction.get_energy_produced|floatformat:"3" }}</td>
+                <td>
+                    {% for appliance in prediction.appliances.all %}
+                        {{ appliance.name }}{% if not forloop.last %}, {% endif %}
+                    {% endfor %}
+                </td>
+                <td>{{ prediction.get_total_energy_consumption }}</td>
+                <td>
+                    <form method="post" action="{% url 'add_appliance_to_weekly_planner' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="weekly_planner" value="{{ prediction.id }}">
+                        <label for="appliance">Select Appliance:</label>
+                        <select name="appliance" id="appliance">
+                            {% for appliance in appliances %}
+                            <option value="{{ appliance.id }}">{{ appliance.name }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="submit" value="Add Appliance">
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+        <br>
+    </div>
+    <script>
+        var predictionData = [
+            {% for prediction in predictions %}
+            {
+                date: "{{ prediction.date }}",
+                energyProduced: {{ prediction.get_energy_produced|floatformat:"3" }}
+            },
+            {% endfor %}
+        ];
+
+        var dates = predictionData.map(function(item) {
+            return item.date;
+        });
+        var energyProducedValues = predictionData.map(function(item) {
+            return item.energyProduced;
+        });
+
+        // bar chart
+        var ctx = document.getElementById("energy-chart").getContext("2d");
+        var chart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: dates,
+                datasets: [{
+                    label: "Energy Produced",
+                    data: energyProducedValues,
+                    backgroundColor: "rgba(114, 163, 74, 0.7)", // Adjust the color as needed
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: "Energy Produced in W/m2"
+                        }
+                    },
+                    x: {
+                        title: {
+                            display: true,
+                            text: "Date"
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>

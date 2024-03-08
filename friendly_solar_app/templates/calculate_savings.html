@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculate Savings</title>
+    {% load static %}
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgba(253, 225, 1, 0.3);
+            color: #333;
+        }
+
+        /* Top Menu Styles */
+        .top-menu {
+            background-color: #72a34a;
+            padding: 10px 20px;
+        }
+
+        .top-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .top-menu li {
+            display: inline;
+        }
+
+        .top-menu a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .top-menu a:hover {
+            background-color: #5c8536;
+        }
+
+        /* Main Content Styles */
+        .main-field {
+            text-align: center;
+            padding: 60px;
+            color: #333;
+            background-image: url("{% static 'img/Europeana.eu-2022502-_KAMRA_309879-49f81f93bd938152120c853dcc40e0d8.jpeg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .main-field h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #72a34a;
+        }
+
+        /* Calculate Savings Page Specific Styles */
+        .calculate-savings {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(10, 10, 10, 0.1);
+            background-color: rgba(253, 225, 1, 0.5);
+        }
+
+        .calculate-savings p {
+            margin-bottom: 10px;
+        }
+
+        .calculate-savings strong {
+            font-weight: bold;
+        }
+
+
+
+    </style>
+</head>
+
+<body>
+    <!-- Top Menu -->
+    <nav class="top-menu">
+        <ul>
+            <li><a href="{% url 'calculate' %}">Home</a></li>
+            <li><a href="{% url 'user_profile' %}">Profile</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- Calculate Savings Content -->
+    <main class="main-field">
+        <div class="calculate-savings">
+            <!-- Display the calculated savings here -->
+            <h1>Calculate Savings</h1>
+            <p><strong>Predicted yearly irradiance*:</strong> {{ irradiance|floatformat:"3" }} kW/m2</p>
+            <p><strong>Predicted yearly savings on energy**:</strong> {{ savings|floatformat:"2" }} PLN/m2</p>
+            <p><strong>Optimal azimuth angle:</strong> {{ azimuth }}°</p>
+            <p><strong>Optimal elevation angle:</strong> {{ elevation }}°</p>
+        </div>
+    </main>
+    <p> *The expected energy production was calculated based on the assumption, that the solar panels would be able to use 20% of the available solar irradiance and that the solar panels would be positioned at the optimal angles.
+**The assumed energy price is in line with the G1 tariff price for active energy purchase, without accounting for fixed and distribution costs.</p>
+</body>
+
+</html>

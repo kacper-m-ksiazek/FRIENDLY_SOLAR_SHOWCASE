@@ -1,0 +1,115 @@
+/* Reset some default styles to ensure consistency across browsers */
+body, h1, h2, p, ul, li {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+/* Top Menu Styles */
+.top-menu {
+    background-color: #72a34a;
+    padding: 10px 20px;
+}
+
+.top-menu ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: space-between;
+}
+
+.top-menu li {
+    display: inline;
+}
+
+.top-menu a {
+    text-decoration: none;
+    color: #fff;
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.top-menu a:hover {
+    background-color: #5c8536;
+}
+
+/* Main Content Styles */
+.main-field {
+    text-align: center;
+    padding: 60px;
+    color: #333;
+    background-color: rgba(255, 209, 26, 0.9);
+}
+
+.main-field h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+    color: #72a34a;
+}
+
+.main-content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(10, 10, 10, 0.1);
+    background-color: #fff;
+}
+
+.main-content label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.main-content input[type="text"] {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.main-content input[type="submit"] {
+    background-color: #72a34a;
+    border: none;
+    color: #fff;
+    padding: 12px 24px;
+    font-size: 18px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.main-content input[type="submit"]:hover {
+    background-color: #5c8536;
+}
+
+/* Bottom Informational Section Styles */
+.info-section {
+    background-color: #fff;
+    padding: 40px;
+    text-align: center;
+}
+
+.info-content {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.info-content h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.info-content p {
+    font-size: 18px;
+}

@@ -1,0 +1,137 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            background-color: rgba(253, 225, 1, 0.3);
+            color: #333;
+        }
+
+        /* Top Menu Styles */
+        .top-menu {
+            background-color: #72a34a;
+            padding: 10px 20px;
+        }
+
+        .top-menu ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .top-menu li {
+            display: inline;
+        }
+
+        .top-menu a {
+            text-decoration: none;
+            color: #fff;
+            font-weight: bold;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .top-menu a:hover {
+            background-color: #5c8536;
+        }
+
+        /* Main Content Styles */
+        .main-field {
+            text-align: center;
+            padding: 60px;
+            color: #333;
+            background-image: url("{% static 'img/Europeana.eu-2022502-_KAMRA_309879-49f81f93bd938152120c853dcc40e0d8.jpeg' %}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center;
+            background-attachment: fixed;
+        }
+
+        .main-field h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #72a34a;
+        }
+
+        .user-profile {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(10, 10, 10, 0.1);
+            background-color: rgba(253, 225, 1, 0.5);
+        }
+
+        .user-profile p {
+            margin-bottom: 10px;
+        }
+
+        .user-profile strong {
+            font-weight: bold;
+        }
+
+        .user-profile a {
+            display: block;
+            margin-top: 20px;
+            text-decoration: none;
+            background-color: #72a34a;
+            color: #fffae6;
+            padding: 12px 24px;
+            font-size: 18px;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .user-profile a:hover {
+            background-color: #5c8536;
+        }
+
+        /* Add more styles and animations as needed */
+
+    </style>
+</head>
+
+<body>
+    <!-- Top Menu -->
+    <nav class="top-menu">
+        <ul>
+            <li><a href="{% url 'calculate' %}">Home</a></li>
+            <li><a href="{% url 'logout' %}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <!-- User Profile -->
+    <main class="main-field">
+        <div class="user-profile">
+            {% if user.is_authenticated %}
+            <h1>Welcome, {{ user.username }}!</h1>
+            <p><strong>Email:</strong> {{ profile.user.email }}</p>
+            <p><strong>Latitude:</strong> {{ profile.latitude }}</p>
+            <p><strong>Longitude:</strong> {{ profile.longitude }}</p>
+            <p><strong>Panel Surface:</strong> {{ profile.panel_surface }} m2</p>
+            <p><strong>Panel Azimuth Angle:</strong> {{ profile.azimuth }}°</p>
+            <p><strong>Panel Elevation Angle:</strong> {{ profile.elevation }}°</p>
+            <a href="{% url 'add_coordinates' %}">Add Coordinates</a>
+            <a href="{% url 'add_panel_surface' %}">Add Panel Surface and Angles</a>
+            <a href="{% url 'calculate_savings' %}">Calculate Savings</a>
+            <a href="{% url 'view_weekly_planner' %}">View Predictions</a>
+            {% endif %}
+        </div>
+    </main>
+
+</body>
+
+</html>
